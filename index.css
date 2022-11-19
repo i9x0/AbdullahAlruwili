@@ -167,16 +167,3 @@ transition: 0.3s ease;
     transform: scale(1.1);
 }
 
-
-@media (min-width:320px)  { body{
- background-color: black;}/* smartphones, portrait iPhone, portrait 480x320 phones (Android) */ }
-@media (min-width:480px)  { body{
-    background-color: black;}/* smartphones, Android phones, landscape iPhone */ }
-@media (min-width:600px)  {  body{
-    background-color: black;}/* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */ }
-@media (min-width:801px)  {  body{
-    background-color: black;}/* tablet, landscape iPad, lo-res laptops ands desktops */ }
-@media (min-width:1025px) { body{
-    background-color: black;}/* big landscape tablets, laptops, and desktops */ }
-@media (min-width:1281px) { body{
-    background-color: black;} /* hi-res laptops and desktops */ }
