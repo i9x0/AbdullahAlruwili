@@ -17,7 +17,7 @@
   <style>
     @media (max-width:500px) {
       header {
-        padding: 0px 30px;
+        padding: 5px 20px;
       }
 
       .logo {
@@ -27,7 +27,7 @@
 
       .navg a {
         font-weight: 200;
-        font-size: 0.6em;
+        font-size: 0.7em;
         padding-left: 5px;
       }
 
@@ -89,21 +89,75 @@
 
 
     }
+    @media (max-width:800px) {
+      .sc1 {
+        padding: 50px;
+     min-width: 100vh;
+        min-height: 100vh;
 
-    @media (min-width:480px) {
-   
 
-      /* smartphones, Android phones, landscape iPhone */
-    }
+      }
+      header {
+        padding: 5px 50px 5px 50px;
+      }
 
-    @media (min-width:600px) {
+      .logo {
+
+        font-size: 1.5em;
+      }
+
+      .navg a {
+        font-weight: 200;
+        font-size: 1em;
+        font-weight: 300;
+        padding-left: 2px;
+        padding-right: 50px;
+      }
+      .screen {
+        margin: 0px;
+        width: 100%;
+        display: inline-block;
+        padding: 100px 50px;
+        height: 120vh;
+      }
+      p {
+        font-size: 0.9em;
+      }
+      img{
+        height: 150px;
+        width: 150px;
+      }   .dirc {
+        flex-direction: column;
+        align-items: center;
+        margin-left: 20px;
+      }
+      
+      .screen1 {
+        min-height: 250vh;
+      }
+      .pa {
+        align-items: center;
+        margin-bottom: 50px;
+      }
    
 
       /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
     }
 
-    @media (min-width:801px) {
-     
+    @media (max-width:1100px) {
+      .dirc {
+        flex-direction: column;
+        align-items: center;
+        margin-left: 20px;
+      }
+      
+      .screen1 {
+        min-height: 250vh;
+      }
+      .pa {
+        align-items: center;
+        margin-bottom: 50px;
+      }
 
       /* tablet, landscape iPad, lo-res laptops ands desktops */
     }
@@ -146,33 +200,29 @@
         </div>
     </div>
   </section>
-  <section>
 
-  </section>
-  <section>
-
-  </section>
-  <section>
-
-  </section>
   <section class="screen" id="AboutMe">
-    <h1 style="text-align: center; padding: 50px; margin-top: 50px;">About Me</h1>
-    <table width="100%">
+  <br><br><br><br><br>  <br><br><br><br><br>
+  <center>
+    <h1 style="text-align: center; ">About Me</h1>
+    <div style="width:100% ; height:100% ;">
+      <div style="float: left; width: 70%; ">
+        <p> I am Abdullah Al-Ruwaili, a recent graduate with a Bachelor’s degree in Computer Science from Jouf
+          University, I am interested and a researcher in data science, a developer of Android and IOS websites and
+          applications using React Native, and my future plan is to develop myself in “Capture the Flag” competitions
+          to improve Safety in my projects</p>
+      </div>
+      <div style="float: right; width: 30%; ">
+        <img style="border-radius: 100%;" src="ksare.jpg" alt="sdf" height="200" width="200">
+      </div>
+    </div>
 
-      <tr>
-        <td width="70%">
-          <p> I am Abdullah Al-Ruwaili, a recent graduate with a Bachelor’s degree in Computer Science from Jouf
-            University, I am interested and a researcher in data science, a developer of Android and IOS websites and
-            applications using React Native, and my future plan is to develop myself in “Capture the Flag” competitions
-            to improve Safety in my projects</p>
-        </td>
-        <td width="30%"><img style="border-radius: 100%;" src="ksare.jpg" alt="sdf" height="200" width="200"></td>
-      </tr>
-    </table>
+  </center>
   </section>
   <section class="screen1" id="projects">
 
     <h1 class="title" id="tit">Projects</h1>
+    
     <div class="dirc">
       <a href="http://www.google.com">
         <div class="pa">
