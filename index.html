@@ -171,7 +171,7 @@ button.tile:hover{border-color:var(--line2);transform:translateY(-1px)}
 .dur{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
 .dur button{border:1.5px solid var(--line2);background:var(--surface);border-radius:12px;padding:8px 14px;font-weight:600;color:var(--fg)}
 .dur button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
-select,input[type=text],textarea{font:inherit;color:var(--fg);background:var(--surface);border:1.5px solid var(--line2);border-radius:12px;padding:10px 12px;width:100%}
+select,input[type=text],input[type=email],textarea{font:inherit;color:var(--fg);background:var(--surface);border:1.5px solid var(--line2);border-radius:12px;padding:10px 12px;width:100%}
 label.l{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
 /* modal & toast */
 .ovl{position:fixed;inset:0;background:rgba(8,20,17,.55);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:50;padding:16px}
@@ -264,6 +264,21 @@ ul.clean li{margin:4px 0}
 .scn .ico{width:40px;height:40px;border-radius:12px;background:var(--forest);color:#fff;display:grid;place-items:center}
 .scn b{font-family:var(--f-d);font-size:16px}
 .scn small{color:var(--muted);font-size:13px;line-height:1.5}
+/* footer */
+.foot{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 22px;box-shadow:var(--shadow);display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;font-size:13.5px;color:var(--muted)}
+.foot .fb{display:flex;flex-direction:column;gap:2px;color:var(--fg)}
+.foot .fb b{font-family:var(--f-d);font-size:17px;line-height:1.2}
+.foot .fb span{color:var(--muted);font-size:12.5px}
+.foot nav{display:flex;flex-wrap:wrap;gap:4px 18px}
+.foot nav button,.foot a{background:none;border:0;padding:6px 0;color:var(--ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.foot nav button:hover,.foot a:hover{text-decoration:underline}
+.foot .sp{flex:1}
+.foot .fm{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.foot .fc{flex-basis:100%;border-top:1px solid var(--line);padding-top:12px;font-size:12.5px;color:var(--faint)}
+.policy h4{font-family:var(--f-d);font-size:15px;margin:16px 0 4px}
+.policy p,.policy li{font-size:14px;line-height:1.75;margin:4px 0}
+.policy ul{margin:4px 0;padding-inline-start:20px}
+.policy .upd{color:var(--muted);font-size:12.5px;margin:0 0 6px}
 .bottom{display:none}
 @media (max-width:1100px){.g-hero,.g-map,.g-irr,.chat,.split{grid-template-columns:minmax(0,1fr)}.g-4{grid-template-columns:repeat(2,minmax(0,1fr))}.g-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:900px){
@@ -376,7 +391,19 @@ ul.clean li{margin:4px 0}
   <nav id="nav" style="display:flex;flex-direction:column;gap:4px"></nav>
   <div class="side-foot"><div class="simnote"><b>وضع المحاكاة</b>كل ما تراه بيانات تجريبية. لا اتصال بأجهزة أو ذكاء اصطناعي حقيقي.</div></div>
  </aside>
- <main class="main"><header class="top" id="top"></header><div id="view" style="display:flex;flex-direction:column;gap:18px;min-height:60vh"></div></main>
+ <main class="main"><header class="top" id="top"></header><div id="view" style="display:flex;flex-direction:column;gap:18px;min-height:60vh"></div>
+ <footer class="foot" aria-label="تذييل الموقع">
+  <div class="fb"><b>Aquense</b><span>حلول ذكية لري أكثر كفاءة واستدامة</span></div>
+  <nav aria-label="السياسات">
+   <button type="button" data-policy="privacy">سياسة الخصوصية</button>
+   <button type="button" data-policy="terms">شروط الاستخدام</button>
+   <button type="button" data-policy="support">سياسة الدعم</button>
+  </nav>
+  <span class="sp"></span>
+  <div class="fm">تواصل معنا: <a href="mailto:info@aquensesolutions.com" dir="ltr">info@aquensesolutions.com</a></div>
+  <div class="fc">© 2026 Aquense. جميع الحقوق محفوظة.</div>
+ </footer>
+ </main>
 </div>
 <nav class="bottom" id="bottom" aria-label="التنقل"></nav>
 <div class="ovl" id="ovl" hidden></div>
@@ -680,7 +707,7 @@ function tick(dt){const prev=new Set(S.alerts.map(a=>a.key));
   S.alerts=computeAlerts();
   for(const a of S.alerts){if(!prev.has(a.key)&&!S.alertsSeen[a.key]){S.alertsSeen[a.key]=1;a.t=S.now;
       log(a.zone,'fault',sevMap(a.sev),`${a.title}${a.zone!=='—'?' في المنطقة '+a.zone:''}`,'محاكاة: أُرسل تنبيه للمزارع');toast(`${a.title}${a.zone!=='—'?' · المنطقة '+a.zone:''}`,a.sev==='crit'||a.sev==='high'?'crit':'warn')}}
-  S.tickets.forEach(t=>{const age=S.now-t.created;const st=age>=45?3:age>=15?2:1;if(st>t.stage){t.stage=st;log('—','user','info',`تحديث تذكرة ${t.id}: ${TSTAGE[st]}`,'محاكاة: لا يوجد دعم حقيقي')}})}
+}
 const TSTAGE=['','تم الاستلام','قيد المراجعة','تم الحل المقترح'];
 /* ================= حالة الواجهة ================= */
 const U={page:'dashboard',layer:'moisture',dur:30,eng:{range:'24h',metric:'moisture',on:{A:1,B:1,C:1,D:1,E:1}},
@@ -967,16 +994,18 @@ function pageFaults(){const A=S.alerts;if(!U.selInc||!A.find(a=>a.key===U.selInc
    <div class="grid g-2" style="margin-top:12px"><div><h2 style="font-size:15px">الأسباب المحتملة</h2><ul class="clean">${a.causes.map(c=>`<li>${c}</li>`).join('')}</ul></div><div><h2 style="font-size:15px">الإجراء المقترح</h2><ul class="clean">${a.actions.map(c=>`<li>${c}</li>`).join('')}</ul></div></div>
    <h2 style="font-size:15px;margin-top:10px">دورة حياة الحادثة (محاكاة)</h2><div class="life">${STAGES.map((s,i)=>`<div class="${i<=st?'done':''} ${i===st?'cur':''}">${s}</div>`).join('')}</div>
    ${st===3?`<p style="color:var(--warn);font-size:13px;margin:0 0 8px">أُغلقت الحادثة يدويًا في المحاكاة، لكن مؤشرات الأدلة ما زالت قائمة وستظل التنبيه ظاهرًا حتى تتغير الحالة.</p>`:''}
-   <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-stage="${a.key}" ${st>=3?'disabled':''}>${ic('check',16)} تقدّم إلى: ${STAGES[Math.min(3,st+1)]}</button><button class="btn sec" data-ticket="${a.key}">${ic('ticket',16)} افتح تذكرة دعم محاكاة</button>
+   <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-stage="${a.key}" ${st>=3?'disabled':''}>${ic('check',16)} تقدّم إلى: ${STAGES[Math.min(3,st+1)]}</button><button class="btn sec" data-ticket="${a.key}">${ic('ticket',16)} افتح تذكرة دعم</button>
    ${a.zone!=='—'?`<button class="btn ghost" data-zone-go="${a.zone}">عرض المنطقة على الخريطة</button>`:''}</div>`}
-  const tk=S.tickets.length?S.tickets.slice().reverse().map(t=>`<div class="alert info" style="align-items:center">${ic('ticket',22)}<div><b>${t.id} · ${esc(t.subject)}</b><small>الأولوية ${t.pr} · ${t.zone==='—'?'عام':'المنطقة '+t.zone} · ${stamp(t.created)}</small><div class="life" style="margin:8px 0 0">${['','تم الاستلام','قيد المراجعة','تم الحل المقترح'].slice(1).map((s,i)=>`<div class="${i+1<=t.stage?'done':''} ${i+1===t.stage?'cur':''}" style="min-width:90px">${s}</div>`).join('')}</div></div></div>`).join(''):'<p class="hint">لا توجد تذاكر. أنشئ تذكرة لتجربة مسار الدعم.</p>';
+  const TKS={sending:['unk','جارٍ الإرسال…'],sent:['ok','أُرسلت إلى فريق الدعم'],failed:['crit','لم تُرسل']};
+  const tk=S.tickets.length?S.tickets.slice().reverse().map(t=>{const s=TKS[t.status]||TKS.sent;return `<div class="alert info" style="align-items:center">${ic('ticket',22)}<div style="min-width:0"><b>${t.id} · ${esc(t.subject)}</b><small>الأولوية ${t.pr} · ${t.zone==='—'?'عام':'المنطقة '+t.zone} · ${stamp(t.created)}</small><span class="pill ${s[0]}" style="margin-top:6px">${s[1]}</span>${t.status==='failed'?`<small style="margin-top:4px">تحقق من اتصالك وأعد المحاولة، أو راسلنا مباشرة على <a href="mailto:${SUPPORT_EMAIL}" dir="ltr">${SUPPORT_EMAIL}</a></small>`:''}</div></div>`}).join(''):'<p class="hint">لا توجد تذاكر بعد.</p>';
   return `<div class="split"><section class="card"><h2>الحوادث</h2><p class="hint">${A.length} حادثة نشطة</p>${list}${hist}</section><section class="card" id="inc-detail">${det}</section></div>
-  <div class="grid g-2"><section class="card" id="tkform"><h2>تذكرة دعم (محاكاة)</h2><p class="hint">تُحفظ في المتصفح فقط. لا يُرسل شيء لأي جهة ولا يوجد دعم حقيقي.</p>
+  <div class="grid g-2"><section class="card" id="tkform"><h2>تذكرة دعم</h2><p class="hint">تُرسل التذكرة إلى فريق الدعم على <span dir="ltr">${SUPPORT_EMAIL}</span>، ويصلك الرد على بريدك.</p>
+   <div class="grid g-2" style="gap:0 12px"><div><label class="l" for="tkn">الاسم</label><input type="text" id="tkn" autocomplete="name" maxlength="80" value="${esc(U.tkn||'')}"></div><div><label class="l" for="tke">بريدك الإلكتروني <span style="color:var(--crit)">*</span></label><input type="email" id="tke" dir="ltr" autocomplete="email" maxlength="120" required value="${esc(U.tke||'')}"></div></div>
    <label class="l" for="tks">الموضوع</label><select id="tks">${A.map(x=>`<option value="${x.key}" ${x.key===U.selInc?'selected':''}>${x.title}${x.zone!=='—'?' · '+x.zone:''}</option>`).join('')}<option value="other">موضوع آخر</option></select>
    <label class="l" for="tkp">الأولوية</label><select id="tkp"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select>
-   <label class="l" for="tkd">وصف المشكلة</label><textarea id="tkd" rows="3" placeholder="اكتب ما لاحظته"></textarea>
-   <div style="margin-top:12px"><button class="btn" id="tksend">${ic('send',16)} إنشاء التذكرة المحاكاة</button></div></section>
-  <section class="card"><h2>تذاكري</h2><p class="hint">تتقدم تلقائيًا مع الوقت المحاكى</p>${tk}</section></div>`}
+   <label class="l" for="tkd">وصف المشكلة</label><textarea id="tkd" rows="3" maxlength="2000" placeholder="اكتب ما لاحظته">${esc(U.tkd||'')}</textarea>
+   <div style="margin-top:12px"><button class="btn" id="tksend" ${U.tkBusy?'disabled':''}>${ic('send',16)} ${U.tkBusy?'جارٍ الإرسال…':'إرسال التذكرة'}</button></div></section>
+  <section class="card"><h2>تذاكري</h2><p class="hint">التذاكر التي أرسلتها في هذه الجلسة</p>${tk}</section></div>`}
 /* ================= السجل ================= */
 const TYN={valve:'صمام',schedule:'جدول',ai:'ذكاء اصطناعي',fault:'عطل',sensor:'حساس',weather:'طقس',user:'مستخدم'};
 function pageLogs(){const f=U.lf,lim={all:1e9,'1h':60,'6h':360,'24h':1440,'48h':2880}[f.time];
@@ -996,7 +1025,7 @@ function pageCtl(){return `<section class="card"><div class="card-h"><div><h2>س
    <div style="font-family:var(--f-d);font-size:32px" id="clk">${dayLabel(S.now)} ${hm(S.now)}</div>
    <div class="seg" role="group" aria-label="سرعة الزمن" style="margin-top:10px">${[[0,'إيقاف'],[1,'×1'],[5,'×5'],[15,'×15']].map(([v,t])=>`<button data-speed="${v}" aria-pressed="${(U.paused?0:S.speed)===v}">${t}</button>`).join('')}</div>
    <p style="font-size:13px;color:var(--muted);margin-top:12px">×1 = دقيقة محاكاة كل ثانية.</p></section>
-  <section class="card"><h2>ما المكتمل وما هو نموذج أولي</h2><ul class="clean" style="font-size:14px"><li><b>مكتمل:</b> الحالة المركزية، 8 سيناريوهات، خريطة تفاعلية، ري يدوي بفحص وتأكيد، مساعد بقواعد محلية، حوادث وتذاكر محاكاة، سجل بمرشحات.</li><li><b>نموذج أولي:</b> بيانات الطقس ثابتة داخل السيناريو، ومؤشرات N/P/K تقديرية، والتاريخ مولّد بنموذج بسيط.</li><li><b>غير موجود عمدًا:</b> أي اتصال بأجهزة أو ذكاء اصطناعي أو خادم.</li></ul></section></div>
+  <section class="card"><h2>ما المكتمل وما هو نموذج أولي</h2><ul class="clean" style="font-size:14px"><li><b>مكتمل:</b> الحالة المركزية، 8 سيناريوهات، خريطة تفاعلية، ري يدوي بفحص وتأكيد، مساعد بقواعد محلية، حوادث محاكاة، تذاكر دعم تُرسل فعليًا إلى بريد الدعم، سجل بمرشحات.</li><li><b>نموذج أولي:</b> بيانات الطقس ثابتة داخل السيناريو، ومؤشرات N/P/K تقديرية، والتاريخ مولّد بنموذج بسيط.</li><li><b>غير موجود عمدًا:</b> أي اتصال بأجهزة أو ذكاء اصطناعي. الاتصال الخارجي الوحيد هو إرسال تذاكر الدعم بالبريد.</li></ul></section></div>
   <section class="card" id="ctl-live"><h2>الحالة المركزية الآن</h2><p class="hint">مصدر واحد تقرأ منه كل الصفحات</p>${ctlLive()}</section>`}
 /* ================= نوافذ ================= */
 function modal(html){const o=$('#ovl');o.hidden=false;o.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}</div>`;fixNums(o);const f=o.querySelector('button.btn:not([disabled])');f&&f.focus()}
@@ -1009,9 +1038,55 @@ function startModal(id,dur){const z=Z(id),ch=safety(z,dur),fail=ch.some(c=>c.s==
   <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" id="mconfirm" data-z="${id}" data-d="${dur}" ${fail?'disabled':''}>${ic('check',16)} تأكيد المحاكاة</button><button class="btn sec" data-close>إلغاء</button></div>`)}
 function resultModal(title,lines,ok){modal(`<div style="text-align:center;padding:6px 0 4px"><div style="width:58px;height:58px;border-radius:50%;background:${ok?'var(--ok-bg)':'var(--crit-bg)'};color:${ok?'var(--ok)':'var(--crit)'};display:grid;place-items:center;margin:0 auto 10px">${ic(ok?'check':'x',30)}</div><h3>${title}</h3></div>${lines.map(l=>`<p style="margin:6px 0">${l}</p>`).join('')}<p class="hint" style="margin-top:12px">تم تسجيل الحدث في سجل النشاط. لم يتأثر أي جهاز حقيقي.</p><button class="btn" data-close style="width:100%">حسنًا</button>`)}
 function stopModal(id){const z=Z(id);modal(`<h3>إيقاف الري المحاكى للمنطقة ${id}</h3><p>سيُغلق الصمام في النموذج بعد ${fdur(S.now-z.valve.openedAt)} من التشغيل. لن يُرسل أمر لجهاز حقيقي.</p><div style="display:flex;gap:10px"><button class="btn danger" id="sconfirm" data-z="${id}">${ic('stop',16)} تأكيد الإيقاف</button><button class="btn sec" data-close>إلغاء</button></div>`)}
-function ticketCreate(){const sel=$('#tks').value,pr=$('#tkp').value,d=$('#tkd').value.trim();const a=S.alerts.find(x=>x.key===sel);
-  const t={id:'AQ-'+(1040+S.tickets.length+1),subject:a?a.title:(d.slice(0,40)||'موضوع عام'),pr,zone:a?a.zone:'—',created:S.now,stage:1};S.tickets.push(t);
-  log(t.zone,'user','info',`إنشاء تذكرة دعم محاكاة ${t.id}: ${t.subject}`,'محاكاة: لم يُرسل لأي جهة');toast(`أُنشئت التذكرة ${t.id} (محاكاة محلية)`);render()}
+const SUPPORT_EMAIL='info@aquensesolutions.com';
+/* يُرسل النموذج عبر FormSubmit (formsubmit.co) لأن الموقع ثابت على GitHub Pages بلا خادم.
+   أول إرسال يصل بريد تفعيل إلى صندوق الدعم؛ بعد الضغط على "Activate Form" تصل التذاكر مباشرة. */
+const TICKET_ENDPOINT='https://formsubmit.co/ajax/'+SUPPORT_EMAIL;
+async function ticketCreate(){if(U.tkBusy)return;
+  const sel=$('#tks').value,pr=$('#tkp').value,d=$('#tkd').value.trim(),nm=$('#tkn').value.trim(),em=$('#tke').value.trim();
+  U.tkn=nm;U.tke=em;U.tkd=d;const a=S.alerts.find(x=>x.key===sel);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){toast('اكتب بريدًا إلكترونيًا صحيحًا ليصلك الرد','warn');$('#tke').focus();return}
+  if(!a&&!d){toast('اكتب وصفًا للمشكلة','warn');$('#tkd').focus();return}
+  const t={id:'AQ-'+(1040+S.tickets.length+1),subject:a?a.title:(d.slice(0,40)||'موضوع عام'),pr,zone:a?a.zone:'—',created:S.now,status:'sending'};
+  S.tickets.push(t);U.tkBusy=true;render();
+  const body={_subject:`تذكرة دعم ${t.id}: ${t.subject} (أولوية ${pr})`,_template:'table',_captcha:'false',
+    name:nm||'—',email:em,Ticket:t.id,Subject:t.subject,Priority:pr,Zone:t.zone==='—'?'عام':t.zone,
+    Description:d||'—',Page:location.href,Sent:new Date().toLocaleString('ar-SA')};
+  try{
+    const r=await fetch(TICKET_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||String(j.success)!=='true')throw new Error(j.message||('HTTP '+r.status));
+    t.status='sent';U.tkd='';
+    log(t.zone,'user','info',`إرسال تذكرة دعم ${t.id}: ${t.subject}`,'أُرسلت إلى فريق الدعم بالبريد');
+    toast(`أُرسلت التذكرة ${t.id} إلى فريق الدعم. سيصلك الرد على ${em}`);
+  }catch(err){
+    t.status='failed';t.err=String(err&&err.message||err);console.warn('[ticket]',t.err);
+    log(t.zone,'user','warn',`تعذّر إرسال تذكرة الدعم ${t.id}`,t.err);
+    toast(`تعذّر إرسال التذكرة ${t.id}. حاول مرة أخرى`,'crit');
+  }
+  U.tkBusy=false;if(U.page==='faults')render()}
+document.addEventListener('input',e=>{const id=e.target.id;if(id==='tkn')U.tkn=e.target.value;else if(id==='tke')U.tke=e.target.value;else if(id==='tkd')U.tkd=e.target.value});
+/* ================= السياسات (التذييل) ================= */
+const POLICY={
+privacy:['سياسة الخصوصية',`<p>توضح هذه السياسة البيانات التي نتعامل معها عند استخدامك منصة Aquense وكيف نستخدمها.</p>
+<h4>البيانات التي نجمعها</h4><ul><li>عند إرسال تذكرة دعم: الاسم، والبريد الإلكتروني، وموضوع التذكرة وأولويتها ووصفها، ورابط الصفحة.</li><li>لا نجمع أي بيانات شخصية أخرى عبر المنصة، ولا نطلب إنشاء حساب.</li></ul>
+<h4>كيف تُرسل التذكرة</h4><p>تُرسل بيانات التذكرة إلى بريد الدعم ${SUPPORT_EMAIL} عبر خدمة FormSubmit (formsubmit.co) لإرسال النماذج، وتخضع معالجتها لديهم لسياسة الخصوصية الخاصة بهم.</p>
+<h4>كيف نستخدم بياناتك</h4><p>نستخدمها للرد على طلبك ومتابعة المشكلة فقط. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.</p>
+<h4>التخزين في متصفحك</h4><p>تُحفظ بعض الإعدادات في متصفحك فقط (مثل إظهار بطاقة "من نحن" مرة واحدة في الجلسة)، ولا تُرسل إلينا.</p>
+<h4>خدمات خارجية</h4><p>تُحمَّل الخطوط من Google Fonts وبعض الصور من GitHub، وقد تسجّل هذه الجهات عنوان IP وفق سياساتها.</p>
+<h4>حقوقك والتواصل</h4><p>لطلب الاطلاع على بياناتك أو حذفها، راسلنا على <a href="mailto:${SUPPORT_EMAIL}" dir="ltr">${SUPPORT_EMAIL}</a>.</p>`],
+terms:['شروط الاستخدام',`<p>باستخدامك منصة Aquense فإنك توافق على الشروط التالية.</p>
+<h4>طبيعة المنصة</h4><p>المنصة حاليًا نسخة عرض تعمل بالمحاكاة. القراءات والتنبيهات والتوصيات بيانات تجريبية ولا تتصل بأجهزة أو حساسات حقيقية.</p>
+<h4>حدود المسؤولية</h4><p>التوصيات المعروضة لا تُغني عن رأي مختص أو فحص ميداني، ولا نتحمل مسؤولية أي قرار يُبنى عليها.</p>
+<h4>الاستخدام المقبول</h4><ul><li>عدم إساءة استخدام نموذج الدعم أو إرسال رسائل مزعجة أو محتوى مسيء.</li><li>عدم محاولة تعطيل المنصة أو الوصول إلى ما لا يحق لك الوصول إليه.</li></ul>
+<h4>الملكية الفكرية</h4><p>اسم Aquense وشعارها ومحتوى المنصة مملوكة لأصحابها، ولا يجوز نسخها أو إعادة استخدامها دون إذن.</p>
+<h4>تعديل الشروط</h4><p>قد نحدّث هذه الشروط من وقت لآخر، ويُعد استمرارك في استخدام المنصة موافقة على النسخة المحدّثة.</p>`],
+support:['سياسة الدعم',`<h4>قنوات الدعم</h4><ul><li>صفحة "الأعطال والدعم" داخل المنصة (إنشاء تذكرة).</li><li>البريد الإلكتروني: <a href="mailto:${SUPPORT_EMAIL}" dir="ltr">${SUPPORT_EMAIL}</a>.</li></ul>
+<h4>بعد إرسال التذكرة</h4><p>تصل التذكرة إلى فريق الدعم بالبريد، ويكون الرد على البريد الإلكتروني الذي أدخلته، فتأكد من كتابته بشكل صحيح.</p>
+<h4>ما يساعدنا على حل المشكلة أسرع</h4><ul><li>وصف واضح لما لاحظته.</li><li>المنطقة المتأثرة ووقت ملاحظة المشكلة.</li><li>أي تغيير حدث قبل ظهور المشكلة.</li></ul>
+<h4>الحالات الطارئة في الميدان</h4><p>عند وجود تسرب كبير أو خطر كهربائي، أوقف المضخة أو الصمام يدويًا أولًا، ثم أرسل التذكرة. لا تنتظر الرد في الحالات التي تتطلب تصرفًا فوريًا.</p>`]};
+function policyModal(k){const p=POLICY[k];if(!p)return;modal(`<div class="policy"><h3>${p[0]}</h3><p class="upd">آخر تحديث: 21 نوفمبر 2026</p>${p[1]}</div><button class="btn" data-close style="width:100%;margin-top:18px">إغلاق</button>`);const m=$('#ovl .modal');if(m)m.scrollTop=0}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-policy]');if(b)policyModal(b.dataset.policy)});
 /* ================= التشغيل والأحداث ================= */
 const PAGE={dashboard:pageDash,engineer:pageEng,assistant:pageAI,faults:pageFaults,logs:pageLogs,control:pageCtl};
 let ptrDown=false;
