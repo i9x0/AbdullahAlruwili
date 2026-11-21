@@ -1039,9 +1039,13 @@ function startModal(id,dur){const z=Z(id),ch=safety(z,dur),fail=ch.some(c=>c.s==
 function resultModal(title,lines,ok){modal(`<div style="text-align:center;padding:6px 0 4px"><div style="width:58px;height:58px;border-radius:50%;background:${ok?'var(--ok-bg)':'var(--crit-bg)'};color:${ok?'var(--ok)':'var(--crit)'};display:grid;place-items:center;margin:0 auto 10px">${ic(ok?'check':'x',30)}</div><h3>${title}</h3></div>${lines.map(l=>`<p style="margin:6px 0">${l}</p>`).join('')}<p class="hint" style="margin-top:12px">تم تسجيل الحدث في سجل النشاط. لم يتأثر أي جهاز حقيقي.</p><button class="btn" data-close style="width:100%">حسنًا</button>`)}
 function stopModal(id){const z=Z(id);modal(`<h3>إيقاف الري المحاكى للمنطقة ${id}</h3><p>سيُغلق الصمام في النموذج بعد ${fdur(S.now-z.valve.openedAt)} من التشغيل. لن يُرسل أمر لجهاز حقيقي.</p><div style="display:flex;gap:10px"><button class="btn danger" id="sconfirm" data-z="${id}">${ic('stop',16)} تأكيد الإيقاف</button><button class="btn sec" data-close>إلغاء</button></div>`)}
 const SUPPORT_EMAIL='info@aquensesolutions.com';
-/* يُرسل النموذج عبر FormSubmit (formsubmit.co) لأن الموقع ثابت على GitHub Pages بلا خادم.
-   أول إرسال يصل بريد تفعيل إلى صندوق الدعم؛ بعد الضغط على "Activate Form" تصل التذاكر مباشرة. */
-const TICKET_ENDPOINT='https://formsubmit.co/ajax/'+SUPPORT_EMAIL;
+/* الموقع ثابت على GitHub Pages بلا خادم، فتُرسل التذاكر عبر خدمة نماذج مجانية.
+   Web3Forms: مفتاح وصول واحد مرتبط ببريد الدعم، بلا تفعيل لكل مُرسِل.
+   المفتاح عام بطبيعته ويُوضع في كود الصفحة. إذا كان فارغًا يُستخدم FormSubmit كاحتياط. */
+const WEB3FORMS_KEY='3237983a-3e92-4738-a4cc-53d0c944618a';
+const USE_W3F=/^[0-9a-f-]{36}$/i.test(WEB3FORMS_KEY);
+const TICKET_ENDPOINT=USE_W3F?'https://api.web3forms.com/submit':'https://formsubmit.co/ajax/'+SUPPORT_EMAIL;
+const TICKET_PROVIDER=USE_W3F?'Web3Forms (web3forms.com)':'FormSubmit (formsubmit.co)';
 async function ticketCreate(){if(U.tkBusy)return;
   const subj=$('#tks').value.trim(),pr=$('#tkp').value,d=$('#tkd').value.trim(),nm=$('#tkn').value.trim(),em=$('#tke').value.trim(),ph=$('#tkph').value.trim().replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c));
   U.tkn=nm;U.tke=em;U.tkd=d;U.tks=subj;U.tkph=ph;U.tkp=pr;
@@ -1051,9 +1055,11 @@ async function ticketCreate(){if(U.tkBusy)return;
   if(!subj&&!d){toast('اكتب موضوع التذكرة أو وصف المشكلة','warn');$('#tks').focus();return}
   const t={id:'AQ-'+(1040+S.tickets.length+1),subject:subj||d.slice(0,40),pr,zone:a?a.zone:'—',created:S.now,status:'sending'};
   S.tickets.push(t);U.tkBusy=true;render();
-  const body={_subject:`تذكرة دعم ${t.id}: ${t.subject} (أولوية ${pr})`,_template:'table',_captcha:'false',
-    name:nm||'—',email:em,Phone:ph||'—',Ticket:t.id,Subject:t.subject,Priority:pr,Zone:t.zone==='—'?'عام':t.zone,
+  const subjLine=`تذكرة دعم ${t.id}: ${t.subject} (أولوية ${pr})`;
+  const fields={name:nm||'—',email:em,Phone:ph||'—',Ticket:t.id,Subject:t.subject,Priority:pr,Zone:t.zone==='—'?'عام':t.zone,
     Description:d||'—',Page:location.href,Sent:new Date().toLocaleString('ar-SA')};
+  const body=USE_W3F?{access_key:WEB3FORMS_KEY,subject:subjLine,from_name:'موقع Aquense',replyto:em,...fields}
+                    :{_subject:subjLine,_template:'table',_captcha:'false',...fields};
   try{
     const r=await fetch(TICKET_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(body)});
     const j=await r.json().catch(()=>({}));
@@ -1072,7 +1078,7 @@ document.addEventListener('input',e=>{const k={tkn:'tkn',tke:'tke',tkd:'tkd',tks
 const POLICY={
 privacy:['سياسة الخصوصية',`<p>توضح هذه السياسة البيانات التي نتعامل معها عند استخدامك منصة Aquense وكيف نستخدمها.</p>
 <h4>البيانات التي نجمعها</h4><ul><li>عند إرسال تذكرة دعم: الاسم، والبريد الإلكتروني، ورقم الهاتف إن أُدخل، وموضوع التذكرة وأولويتها ووصفها، ورابط الصفحة.</li><li>لا نجمع أي بيانات شخصية أخرى عبر المنصة، ولا نطلب إنشاء حساب.</li></ul>
-<h4>كيف تُرسل التذكرة</h4><p>تُرسل بيانات التذكرة إلى بريد الدعم ${SUPPORT_EMAIL} عبر خدمة FormSubmit (formsubmit.co) لإرسال النماذج، وتخضع معالجتها لديهم لسياسة الخصوصية الخاصة بهم.</p>
+<h4>كيف تُرسل التذكرة</h4><p>تُرسل بيانات التذكرة إلى بريد الدعم ${SUPPORT_EMAIL} عبر خدمة ${TICKET_PROVIDER} لإرسال النماذج، وتخضع معالجتها لديهم لسياسة الخصوصية الخاصة بهم.</p>
 <h4>كيف نستخدم بياناتك</h4><p>نستخدمها للرد على طلبك ومتابعة المشكلة فقط. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.</p>
 <h4>التخزين في متصفحك</h4><p>تُحفظ بعض الإعدادات في متصفحك فقط (مثل إظهار بطاقة "من نحن" مرة واحدة في الجلسة)، ولا تُرسل إلينا.</p>
 <h4>خدمات خارجية</h4><p>تُحمَّل الخطوط من Google Fonts وبعض الصور من GitHub، وقد تسجّل هذه الجهات عنوان IP وفق سياساتها.</p>
