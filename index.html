@@ -171,7 +171,7 @@ button.tile:hover{border-color:var(--line2);transform:translateY(-1px)}
 .dur{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
 .dur button{border:1.5px solid var(--line2);background:var(--surface);border-radius:12px;padding:8px 14px;font-weight:600;color:var(--fg)}
 .dur button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
-select,input[type=text],input[type=email],textarea{font:inherit;color:var(--fg);background:var(--surface);border:1.5px solid var(--line2);border-radius:12px;padding:10px 12px;width:100%}
+select,input[type=text],input[type=email],input[type=tel],textarea{font:inherit;color:var(--fg);background:var(--surface);border:1.5px solid var(--line2);border-radius:12px;padding:10px 12px;width:100%}
 label.l{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
 /* modal & toast */
 .ovl{position:fixed;inset:0;background:rgba(8,20,17,.55);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:50;padding:16px}
@@ -1001,8 +1001,8 @@ function pageFaults(){const A=S.alerts;if(!U.selInc||!A.find(a=>a.key===U.selInc
   return `<div class="split"><section class="card"><h2>الحوادث</h2><p class="hint">${A.length} حادثة نشطة</p>${list}${hist}</section><section class="card" id="inc-detail">${det}</section></div>
   <div class="grid g-2"><section class="card" id="tkform"><h2>تذكرة دعم</h2><p class="hint">تُرسل التذكرة إلى فريق الدعم على <span dir="ltr">${SUPPORT_EMAIL}</span>، ويصلك الرد على بريدك.</p>
    <div class="grid g-2" style="gap:0 12px"><div><label class="l" for="tkn">الاسم</label><input type="text" id="tkn" autocomplete="name" maxlength="80" value="${esc(U.tkn||'')}"></div><div><label class="l" for="tke">بريدك الإلكتروني <span style="color:var(--crit)">*</span></label><input type="email" id="tke" dir="ltr" autocomplete="email" maxlength="120" required value="${esc(U.tke||'')}"></div></div>
-   <label class="l" for="tks">الموضوع</label><select id="tks">${A.map(x=>`<option value="${x.key}" ${x.key===U.selInc?'selected':''}>${x.title}${x.zone!=='—'?' · '+x.zone:''}</option>`).join('')}<option value="other">موضوع آخر</option></select>
-   <label class="l" for="tkp">الأولوية</label><select id="tkp"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select>
+   <div class="grid g-2" style="gap:0 12px"><div><label class="l" for="tkph">رقم الهاتف</label><input type="tel" id="tkph" dir="ltr" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="05xxxxxxxx" value="${esc(U.tkph||'')}"></div><div><label class="l" for="tkp">الأولوية</label><select id="tkp">${['عادية','مرتفعة','عاجلة'].map(p=>`<option ${p===(U.tkp||'عادية')?'selected':''}>${p}</option>`).join('')}</select></div></div>
+   <label class="l" for="tks">الموضوع</label><input type="text" id="tks" maxlength="120" placeholder="اكتب عنوانًا مختصرًا للمشكلة" value="${esc(U.tks||'')}">
    <label class="l" for="tkd">وصف المشكلة</label><textarea id="tkd" rows="3" maxlength="2000" placeholder="اكتب ما لاحظته">${esc(U.tkd||'')}</textarea>
    <div style="margin-top:12px"><button class="btn" id="tksend" ${U.tkBusy?'disabled':''}>${ic('send',16)} ${U.tkBusy?'جارٍ الإرسال…':'إرسال التذكرة'}</button></div></section>
   <section class="card"><h2>تذاكري</h2><p class="hint">التذاكر التي أرسلتها في هذه الجلسة</p>${tk}</section></div>`}
@@ -1043,20 +1043,22 @@ const SUPPORT_EMAIL='info@aquensesolutions.com';
    أول إرسال يصل بريد تفعيل إلى صندوق الدعم؛ بعد الضغط على "Activate Form" تصل التذاكر مباشرة. */
 const TICKET_ENDPOINT='https://formsubmit.co/ajax/'+SUPPORT_EMAIL;
 async function ticketCreate(){if(U.tkBusy)return;
-  const sel=$('#tks').value,pr=$('#tkp').value,d=$('#tkd').value.trim(),nm=$('#tkn').value.trim(),em=$('#tke').value.trim();
-  U.tkn=nm;U.tke=em;U.tkd=d;const a=S.alerts.find(x=>x.key===sel);
+  const subj=$('#tks').value.trim(),pr=$('#tkp').value,d=$('#tkd').value.trim(),nm=$('#tkn').value.trim(),em=$('#tke').value.trim(),ph=$('#tkph').value.trim().replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c));
+  U.tkn=nm;U.tke=em;U.tkd=d;U.tks=subj;U.tkph=ph;U.tkp=pr;
+  const a=U.tkInc?S.alerts.find(x=>x.key===U.tkInc&&x.title===subj):null;
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){toast('اكتب بريدًا إلكترونيًا صحيحًا ليصلك الرد','warn');$('#tke').focus();return}
-  if(!a&&!d){toast('اكتب وصفًا للمشكلة','warn');$('#tkd').focus();return}
-  const t={id:'AQ-'+(1040+S.tickets.length+1),subject:a?a.title:(d.slice(0,40)||'موضوع عام'),pr,zone:a?a.zone:'—',created:S.now,status:'sending'};
+  if(ph&&!/^\+?[0-9\s()-]{7,20}$/.test(ph)){toast('اكتب رقم هاتف صحيحًا أو اترك الخانة فارغة','warn');$('#tkph').focus();return}
+  if(!subj&&!d){toast('اكتب موضوع التذكرة أو وصف المشكلة','warn');$('#tks').focus();return}
+  const t={id:'AQ-'+(1040+S.tickets.length+1),subject:subj||d.slice(0,40),pr,zone:a?a.zone:'—',created:S.now,status:'sending'};
   S.tickets.push(t);U.tkBusy=true;render();
   const body={_subject:`تذكرة دعم ${t.id}: ${t.subject} (أولوية ${pr})`,_template:'table',_captcha:'false',
-    name:nm||'—',email:em,Ticket:t.id,Subject:t.subject,Priority:pr,Zone:t.zone==='—'?'عام':t.zone,
+    name:nm||'—',email:em,Phone:ph||'—',Ticket:t.id,Subject:t.subject,Priority:pr,Zone:t.zone==='—'?'عام':t.zone,
     Description:d||'—',Page:location.href,Sent:new Date().toLocaleString('ar-SA')};
   try{
     const r=await fetch(TICKET_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(body)});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||String(j.success)!=='true')throw new Error(j.message||('HTTP '+r.status));
-    t.status='sent';U.tkd='';
+    t.status='sent';U.tkd='';U.tks='';U.tkInc=null;
     log(t.zone,'user','info',`إرسال تذكرة دعم ${t.id}: ${t.subject}`,'أُرسلت إلى فريق الدعم بالبريد');
     toast(`أُرسلت التذكرة ${t.id} إلى فريق الدعم. سيصلك الرد على ${em}`);
   }catch(err){
@@ -1065,11 +1067,11 @@ async function ticketCreate(){if(U.tkBusy)return;
     toast(`تعذّر إرسال التذكرة ${t.id}. حاول مرة أخرى`,'crit');
   }
   U.tkBusy=false;if(U.page==='faults')render()}
-document.addEventListener('input',e=>{const id=e.target.id;if(id==='tkn')U.tkn=e.target.value;else if(id==='tke')U.tke=e.target.value;else if(id==='tkd')U.tkd=e.target.value});
+document.addEventListener('input',e=>{const k={tkn:'tkn',tke:'tke',tkd:'tkd',tks:'tks',tkph:'tkph',tkp:'tkp'}[e.target.id];if(k)U[k]=e.target.value});
 /* ================= السياسات (التذييل) ================= */
 const POLICY={
 privacy:['سياسة الخصوصية',`<p>توضح هذه السياسة البيانات التي نتعامل معها عند استخدامك منصة Aquense وكيف نستخدمها.</p>
-<h4>البيانات التي نجمعها</h4><ul><li>عند إرسال تذكرة دعم: الاسم، والبريد الإلكتروني، وموضوع التذكرة وأولويتها ووصفها، ورابط الصفحة.</li><li>لا نجمع أي بيانات شخصية أخرى عبر المنصة، ولا نطلب إنشاء حساب.</li></ul>
+<h4>البيانات التي نجمعها</h4><ul><li>عند إرسال تذكرة دعم: الاسم، والبريد الإلكتروني، ورقم الهاتف إن أُدخل، وموضوع التذكرة وأولويتها ووصفها، ورابط الصفحة.</li><li>لا نجمع أي بيانات شخصية أخرى عبر المنصة، ولا نطلب إنشاء حساب.</li></ul>
 <h4>كيف تُرسل التذكرة</h4><p>تُرسل بيانات التذكرة إلى بريد الدعم ${SUPPORT_EMAIL} عبر خدمة FormSubmit (formsubmit.co) لإرسال النماذج، وتخضع معالجتها لديهم لسياسة الخصوصية الخاصة بهم.</p>
 <h4>كيف نستخدم بياناتك</h4><p>نستخدمها للرد على طلبك ومتابعة المشكلة فقط. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.</p>
 <h4>التخزين في متصفحك</h4><p>تُحفظ بعض الإعدادات في متصفحك فقط (مثل إظهار بطاقة "من نحن" مرة واحدة في الجلسة)، ولا تُرسل إلينا.</p>
@@ -1136,7 +1138,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-
   if(d.q){ask(d.q);return}
   if(d.prefill){const [z,du]=d.prefill.split('|');S.sel=z;U.dur=+du;U.page='dashboard';history.replaceState(null,'','#dashboard');render(false);scrollTo(0,0);startModal(z,+du);return}
   if(d.stage){S.incStatus[d.stage]=Math.min(3,(S.incStatus[d.stage]||0)+1);const a=S.alerts.find(x=>x.key===d.stage);log(a?a.zone:'—','fault','info',`تحديث حالة الحادثة: ${a?a.title:''} ← ${STAGES[S.incStatus[d.stage]]}`,'محاكاة: تغيّرت حالة الحادثة محليًا');render();return}
-  if(d.ticket){U.selInc=d.ticket;render();setTimeout(()=>{const f=$('#tkform');f&&f.scrollIntoView({behavior:'smooth',block:'center'});const x=$('#tks');x&&(x.value=d.ticket)},30);return}
+  if(d.ticket){U.selInc=d.ticket;const ai=S.alerts.find(x=>x.key===d.ticket);if(ai){U.tks=ai.title;U.tkInc=ai.key}render();setTimeout(()=>{const f=$('#tkform');f&&f.scrollIntoView({behavior:'smooth',block:'center'})},30);return}
   if(d.zoneGo){S.sel=d.zoneGo;go('dashboard');return}
   if(d.speed!==undefined){const v=+d.speed;if(v===0)U.paused=true;else{U.paused=false;S.speed=v}render();return}
   const id=t.id;
